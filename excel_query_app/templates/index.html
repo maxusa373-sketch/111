@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>Excel 查詢系統</title>
+</head>
+<body>
+    <h2>GREE零件查詢系統</h2>
+    <form id="search-form">
+        <label>品名：</label>
+        <input type="text" id="product_name"><br><br>
+        <label>料號：</label>
+        <input type="text" id="part_number"><br><br>
+        <label>適用機型：</label>
+        <input type="text" id="model"><br><br>
+        <button type="submit">查詢</button>
+    </form>
+
+    <h3>查詢結果：</h3>
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('search-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const product_name = document.getElementById('product_name').value;
+            const part_number = document.getElementById('part_number').value;
+            const model = document.getElementById('model').value;
+
+            const response = await fetch('/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    product_name,
+                    part_number,
+                    model
+                })
+            });
+
+            const data = await response.json();
+            const resultDiv = document.getElementById('results');
+            resultDiv.innerHTML = '';
+
+            if (data.length === 0) {
+                resultDiv.innerHTML = '<p>查無資料。</p>';
+            } else {
+                data.forEach(item => {
+                    resultDiv.innerHTML += `<p>品名：${item['品名']}，料號：${item['料號']}，適用機型：${item['適用機型']}</p>`;
+                });
+            }
+        });
+    </script>
+</body>
+</html>
